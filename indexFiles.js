@@ -17,9 +17,9 @@ function indexer(files) {
   for (var i = 0; i < fileArr.length; i++) {
     var fileName = fileArr[i];
     var fileLines = obj1[fileName];
-    finalObj = separateWords(fileLines, fileName, finalObj);
+    finalObj = buildFinalObject(fileLines, fileName, finalObj);
   }
-  console.log(finalObj);
+  printIndex(finalObj);
 }
 
 function putArrayOfLinesIntoObj(fileArr) {
@@ -33,48 +33,58 @@ function putArrayOfLinesIntoObj(fileArr) {
   return objectOfLinesArray;
 }
 
-function separateWords(fileLines, fileName, finalObj) {
-  var tempObj1 = finalObj;
+function buildFinalObject(fileLines, fileName, finalObj) {
   for (var i = 0; i < fileLines.length; i++) {
     var words = fileLines[i].split(' ');
     var lineNum = i + 1;
-    var tempObj2 = buildFinalObject(words, lineNum, fileName, tempObj1);
-    tempObj1 = tempObj2;
+    var finalObj = organizeFinalObject(words, lineNum, fileName, finalObj);
   }
-  return tempObj1;
+  return finalObj;
 }
 
-function buildFinalObject(words, lineNum, fileName, finalObj) {
-  var tempObj1 = finalObj;
+function organizeFinalObject(words, lineNum, fileName, finalObj) {
   for (var i = 0; i < words.length; i++) {
     var wordLowerCase = words[i].toLowerCase();
     if (wordLowerCase !== '') {
-      if (!tempObj1.hasOwnProperty(wordLowerCase))
-        tempObj1[wordLowerCase] = {};
-      if (!tempObj1[wordLowerCase].hasOwnProperty(fileName))
-        tempObj1[wordLowerCase][fileName] = [];
-      if (tempObj1[wordLowerCase][fileName].indexOf(lineNum) === -1)
-        tempObj1[wordLowerCase][fileName].push(lineNum);
+      if (!finalObj.hasOwnProperty(wordLowerCase))
+        finalObj[wordLowerCase] = {};
+      if (!finalObj[wordLowerCase].hasOwnProperty(fileName))
+        finalObj[wordLowerCase][fileName] = [];
+      if (finalObj[wordLowerCase][fileName].indexOf(lineNum) === -1)
+        finalObj[wordLowerCase][fileName].push(lineNum);
     }
   }
-  return tempObj1;
+  return finalObj;
 }
-//   var wordsAlphabetize = Object.keys(finalObj).sort(compareLetters);
-//   for (var i = 0; i < wordsAlphabetize.length; i++) {
-//     var wordToPrint = wordsAlphabetize[i];
-//     var fileNamesAlphabetize = Object.keys(finalObj[wordToPrint]).sort(compareLetters);
-//     console.log(wordToPrint);
-//     for (var j = 0; j < fileNamesAlphabetize.length; j++) {
-//       var fileNameToPrint = fileNamesAlphabetize[j];
-//       var lineNumsOrdered = finalObj[wordToPrint][fileNameToPrint].sort(compareNumbers);
-//       var lineNumsStr = '';
-//       for (var k = 0; k < lineNumsOrdered.length; k++) {
-//         lineNumsStr += " " + lineNumsOrdered[k];
-//       }
-//       console.log('\t', fileNameToPrint, lineNumsStr);
-//     }
-//   }
-//
-// }
+
+function printIndex(finalObj) {
+  var wordsAlphabetize = Object.keys(finalObj).sort(compareLetters);
+  printWords(finalObj, wordsAlphabetize);
+}
+
+function printWords(finalObj, wordsAlphabetize) {
+  for (var i = 0; i < wordsAlphabetize.length; i++) {
+    var wordToPrint = wordsAlphabetize[i];
+    console.log(wordToPrint);
+    getFileNameAndLineNums(finalObj, wordToPrint);
+  }
+}
+
+function getFileNameAndLineNums(finalObj, wordToPrint) {
+  var fileNamesAlphabetize = Object.keys(finalObj[wordToPrint]).sort(compareLetters);
+  for (var i = 0; i < fileNamesAlphabetize.length; i++) {
+    var fileNameToPrint = fileNamesAlphabetize[i];
+    var lineNumsOrdered = finalObj[wordToPrint][fileNameToPrint].sort(compareNumbers);
+    printFileNameAndLineNums(fileNameToPrint, lineNumsOrdered);
+  }
+}
+
+function printFileNameAndLineNums(fileNameToPrint, lineNumsOrdered){
+  var lineNumsStrToPrint = '';
+  for (var i = 0; i < lineNumsOrdered.length; i++) {
+    lineNumsStrToPrint += " " + lineNumsOrdered[i];
+  }
+  console.log('\t', fileNameToPrint, lineNumsStrToPrint);
+}
 
 indexer('file1.txt','file2.txt','file3.txt');
